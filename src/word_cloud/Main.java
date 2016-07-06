@@ -10,10 +10,8 @@ import java.util.StringTokenizer;
 import org.graphstream.graph.Graph;
 import org.graphstream.graph.Node;
 import org.graphstream.graph.implementations.SingleGraph;
-import org.graphstream.ui.view.View;
-import org.graphstream.ui.view.Viewer;
+import org.graphstream.stream.file.FileSinkDOT;
 
-import com.sun.org.apache.xpath.internal.operations.And;
 
 public class Main{
 	public static void main(String[] args) throws IOException{
@@ -22,21 +20,24 @@ public class Main{
 			    "node {" +
 			    "   fill-color: blue;" +
 			    "	size-mode: dyn-size;"+
-			    "	size: 3px;"+
-			    "	text-alignment: under;"+
+			    "	size: 1px;"+
+			    "	text-alignment: center;"+
 			    "	text-size: 8px;"+
+			    //"	text-mode: hidden;"+
 			    "}" +
 
 			    "edge {"+
 			    "	shape: line;"+
 			    "	fill-color: #222;"+
 			    "}";
-		URL data = Main.class.getResource("test.csv");
+		URL data = Main.class.getResource("iglesia.csv");
 		Graph tweets = new SingleGraph("Word Cloud");
+		String filePath = "iglesia_graph.dot";
 		tweets.addAttribute("ui.stylesheet", styleSheet);
 		tweets.addAttribute("ui.quality");
 		tweets.addAttribute("ui.antialias");
 		tweets.addAttribute("ui.screenshoot", "graph.png");
+		tweets.addAttribute("layout.quality",4);
 		
 		
 		BufferedReader br = null;
@@ -51,8 +52,9 @@ public class Main{
 				//Use comma as separator
 				String[] tweet = line.split(cvsSplitBy);
 				//Detects language for each tweet
-				if (tweet[5].equals(lang)){
-					StringTokenizer tokens=new StringTokenizer(tweet[4], "&");
+				if (tweet[4].equals(lang)){
+					//words[3] hashtags[7]
+					StringTokenizer tokens=new StringTokenizer(tweet[3], "&");
 					String prev = "";
 					while(tokens.hasMoreTokens()){
 						String str=tokens.nextToken();						
@@ -114,16 +116,20 @@ public class Main{
 		
 		for (Node n: tweets){
 				n.addAttribute("ui.label", n.getId());
-				int size = Integer.parseInt(n.getAttribute("weight").toString());
-				size = size +3;
+				double size = Integer.parseInt(n.getAttribute("weight").toString());
+				size = size*0.5 +1;
 				n.addAttribute("ui.size", size );
 				
 		}
 		//display
-		Viewer viewer = tweets.display(true);
+		tweets.display();
 		
 		/*View view = viewer.getDefaultView();
 		view.getCamera().setViewPercent(0.5);*/
+		
+		//save
+		FileSinkDOT fs = new FileSinkDOT();
+		fs.writeAll(tweets, filePath);
 
 	}
 	
