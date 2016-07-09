@@ -70,6 +70,7 @@ public class Main{
 									//Add edge to connect on tweet
 									String edge_name = prev+str;
 									tweets.addEdge(edge_name, prev, str);
+									tweets.getEdge(edge_name).setAttribute("weight", 1);
 									tweets.getNode(str).setAttribute("cons", j);
 									tweets.getNode(prev).setAttribute("cons", k);
 									prev = str;
@@ -91,6 +92,16 @@ public class Main{
 										tweets.getNode(str).setAttribute("cons", j);
 										tweets.getNode(prev).setAttribute("cons", k);
 										tweets.addEdge(edge_name, prev, str);
+										tweets.getEdge(edge_name).setAttribute("weight", 1);
+									}else{
+										//Add weight of edge if exists
+										if(tweets.getEdge(edge_name) != null){
+											int l = Integer.parseInt(tweets.getEdge(edge_name).getAttribute("weight").toString())+1;
+											tweets.getEdge(edge_name).setAttribute("weight", l);
+										}else{
+											int m = Integer.parseInt(tweets.getEdge(edge_name2).getAttribute("weight").toString())+1;
+											tweets.getEdge(edge_name2).setAttribute("weight", m);
+										}
 									}
 								}
 								
