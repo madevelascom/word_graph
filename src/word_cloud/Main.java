@@ -30,9 +30,14 @@ public class Main{
 			    "	shape: line;"+
 			    "	fill-color: #222;"+
 			    "}";
-		URL data = Main.class.getResource("iglesia.csv");
+		
+		//tw_cosas_hacer_IntinanMuseum  tw_cosas_hacer_LaVirginlPanecillo
+		//tw_cosas_hacer_MuseoMindae tw_cosas_hacer_MuseoSanAgustin
+		//tw_cosas_hacer_ParqueLaCarolina
+		
+		URL data = Main.class.getResource("tw_cosas_hacer_ParqueLaCarolina.csv");
 		Graph tweets = new SingleGraph("Word Cloud");
-		String filePath = "iglesia_graph.dot";
+		String filePath = "ParqueLaCarolina_EN.dot";
 		tweets.addAttribute("ui.stylesheet", styleSheet);
 		tweets.addAttribute("ui.quality");
 		tweets.addAttribute("ui.antialias");
@@ -44,7 +49,7 @@ public class Main{
 		String line = "";
 		String cvsSplitBy = ",";
 		//Predef lang = spanish
-		String lang = "es";
+		String lang = "en";
 		
 		try {
 			br = new BufferedReader(new FileReader(data.getPath()));
@@ -57,54 +62,56 @@ public class Main{
 					StringTokenizer tokens=new StringTokenizer(tweet[3], "&");
 					String prev = "";
 					while(tokens.hasMoreTokens()){
-						String str=tokens.nextToken();						
-						if (!str.isEmpty()){
-							//If node doesn't exist
-							if (tweets.getNode(str)== null){
-								tweets.addNode(str).addAttribute("weight", 1);
-								tweets.getNode(str).addAttribute("cons", 0);
-								
-								if(!prev.equals("")){
-									int j = Integer.parseInt(tweets.getNode(str).getAttribute("cons").toString())+1;
-									int k = Integer.parseInt(tweets.getNode(prev).getAttribute("cons").toString())+1;
-									//Add edge to connect on tweet
-									String edge_name = prev+str;
-									tweets.addEdge(edge_name, prev, str);
-									tweets.getEdge(edge_name).setAttribute("weight", 1);
-									tweets.getNode(str).setAttribute("cons", j);
-									tweets.getNode(prev).setAttribute("cons", k);
-									prev = str;
-								}
-								prev = str;
-							}
-							//If node exists, modifies weight
-							else{
-								int i = tweets.getNode(str).getAttribute("weight");
-								tweets.getNode(str).setAttribute("weight", i+1);
-								//If node doesn't have prev node
-								if(!prev.equals("")){
-									String edge_name = prev+str;
-									String edge_name2 = str+prev;
-									//Find if edge doesn't exists
-									if((tweets.getEdge(edge_name) == null) && (tweets.getEdge(edge_name2) == null)){
+						String str=tokens.nextToken();	
+						//Ignore if word refers to city location
+						if(!str.equals("ecuador") &&  !str.equals("quito") &&  !str.equals("pichincha")){
+							if (!str.isEmpty()){
+								//If node doesn't exist
+								if (tweets.getNode(str)== null){
+									tweets.addNode(str).addAttribute("weight", 1);
+									tweets.getNode(str).addAttribute("cons", 0);
+									
+									if(!prev.equals("")){
 										int j = Integer.parseInt(tweets.getNode(str).getAttribute("cons").toString())+1;
 										int k = Integer.parseInt(tweets.getNode(prev).getAttribute("cons").toString())+1;
-										tweets.getNode(str).setAttribute("cons", j);
-										tweets.getNode(prev).setAttribute("cons", k);
+										//Add edge to connect on tweet
+										String edge_name = prev+str;
 										tweets.addEdge(edge_name, prev, str);
 										tweets.getEdge(edge_name).setAttribute("weight", 1);
-									}else{
-										//Add weight of edge if exists
-										if(tweets.getEdge(edge_name) != null){
-											int l = Integer.parseInt(tweets.getEdge(edge_name).getAttribute("weight").toString())+1;
-											tweets.getEdge(edge_name).setAttribute("weight", l);
+										tweets.getNode(str).setAttribute("cons", j);
+										tweets.getNode(prev).setAttribute("cons", k);
+										prev = str;
+									}
+									prev = str;
+								}
+							//If node exists, modifies weight
+								else{
+									int i = tweets.getNode(str).getAttribute("weight");
+									tweets.getNode(str).setAttribute("weight", i+1);
+									//If node doesn't have prev node
+									if(!prev.equals("")){
+										String edge_name = prev+str;
+										String edge_name2 = str+prev;
+										//Find if edge doesn't exists
+										if((tweets.getEdge(edge_name) == null) && (tweets.getEdge(edge_name2) == null)){
+											int j = Integer.parseInt(tweets.getNode(str).getAttribute("cons").toString())+1;
+											int k = Integer.parseInt(tweets.getNode(prev).getAttribute("cons").toString())+1;
+											tweets.getNode(str).setAttribute("cons", j);
+											tweets.getNode(prev).setAttribute("cons", k);
+											tweets.addEdge(edge_name, prev, str);
+											tweets.getEdge(edge_name).setAttribute("weight", 1);
 										}else{
-											int m = Integer.parseInt(tweets.getEdge(edge_name2).getAttribute("weight").toString())+1;
-											tweets.getEdge(edge_name2).setAttribute("weight", m);
+											//Add weight of edge if exists
+											if(tweets.getEdge(edge_name) != null){
+												int l = Integer.parseInt(tweets.getEdge(edge_name).getAttribute("weight").toString())+1;
+												tweets.getEdge(edge_name).setAttribute("weight", l);
+											}else{
+												int m = Integer.parseInt(tweets.getEdge(edge_name2).getAttribute("weight").toString())+1;
+												tweets.getEdge(edge_name2).setAttribute("weight", m);
+											}
 										}
 									}
 								}
-								
 							}
 						}
 					}
